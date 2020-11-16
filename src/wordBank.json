@@ -1,5 +1,7 @@
 {
   "default": [
-    "banana", "bottle", "shoe"
+    "banana",
+    "bottle",
+    "shoe"
   ]
 }
