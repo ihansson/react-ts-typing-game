@@ -1,0 +1,25 @@
+{
+
+  "title": "Typing Tester",
+  "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis fugit, enim molestiae praesentium eveniet.",
+
+  "scores_title": "Scores",
+  "high_scores_title": "High Score",
+  "scores_graph_title": "Previous Scores",
+  "scores_empty": "No scores yet.",
+
+  "settings_title": "Settings",
+  "word_bank": "Word Bank",
+  "word_bank_description": "Comma separated list of words to practice",
+  "time_limit": "Time Limit",
+  "time_limit_description": "Adjust the game time limit in milliseconds",
+
+  "start_game": "Start Game",
+  "stop_game": "Stop Game",
+  "score": "Score",
+  "time_left": "Time Left",
+
+  "clear": "Clear",
+  "reset": "Reset"
+
+}
