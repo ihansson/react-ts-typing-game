@@ -1,21 +1,39 @@
-import React from 'react';
-import text from "../text.json";
+import React, {useMemo, useEffect, useRef} from 'react';
+import text from "../data/text.json";
 import {Chart} from 'react-charts'
+
+import defaultState from '../data/defaulteState.json'
+import {useLocalStorage} from "../lib/useLocalStorage";
+
+import {shuffleArray} from '../lib/helpers'
+
+defaultState.wordBank =  shuffleArray(defaultState.wordBank)
 
 export default function Landing(props) {
 
-    const state = props.state
-    const setState = props.setState
-    const setPage = props.setPage
-    const defaultState = props.defaultState
+    const [state, setState] = useLocalStorage('typingTesterState3', defaultState)
+    const setStateRef = useRef(setState)
 
-    const axes = React.useMemo(
+    const axes = useMemo(
         () => [
             {primary: true, type: 'linear', position: 'bottom'},
             {type: 'linear', position: 'left'}
         ],
         []
     )
+    useEffect(() => {
+        if("score" in props.gameState) {
+            setStateRef.current((_state: any) => {
+                let scores = _state.scores.slice()
+                scores.push(props.gameState.score)
+                return  {
+                    ..._state,
+                    scores: scores,
+                    high_score: props.gameState.score > _state.high_score ? props.gameState.score : _state.high_score,
+                }
+            })
+        }
+    }, [props.gameState]);
 
     return (<div>
         <h1 className="font-serif font-bold text-4xl mb-3">{text.title}</h1>
@@ -86,7 +104,7 @@ export default function Landing(props) {
         </div>
         <div className="mt-4 text-right">
             <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-8 rounded" onClick={() => {
-                setPage('Countdown')
+                props.onStartGame(state)
             }}>{text.start_game}</button>
         </div>
     </div>)

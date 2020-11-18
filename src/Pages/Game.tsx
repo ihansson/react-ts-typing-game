@@ -1,11 +1,35 @@
 import React, {useEffect, useState, useRef} from 'react';
-import text from "../text.json";
+import text from "../data/text.json";
 
 const defaultGame = {
     currentWord: 0,
     nextWord: 1,
     letterIndex: 0,
     score: 0,
+}
+
+function handleKeyEvent(key, gameState, setGameState, onError){
+    const letter = gameState.wordBank[gameState.currentWord][gameState.letterIndex]
+    if (letter === key) {
+        if (gameState.letterIndex === gameState.wordBank[gameState.currentWord].length - 1) {
+            setGameState((_state: any) => {
+                return {
+                    ..._state,
+                    score: _state.score + 1,
+                    currentWord: _state.nextWord,
+                    nextWord: _state.wordBank.length === _state.nextWord + 1 ? 0 : _state.nextWord + 1,
+                    letterIndex: 0,
+                }
+            })
+        } else {
+            setGameState((_state: any) => ({
+                ..._state,
+                letterIndex: _state.letterIndex + 1,
+            }))
+        }
+    } else {
+        onError()
+    }
 }
 
 export default function Game(props) {
@@ -18,33 +42,15 @@ export default function Game(props) {
     let [erroredRecently, setErroredRecently] = useState(false)
     let errorTimeout: any = useRef(null)
 
-    function onKeyDown(e: KeyboardEvent) {
-        const letter = gameState.wordBank[gameState.currentWord][gameState.letterIndex]
-        if (letter === e.key) {
-            if (gameState.letterIndex === gameState.wordBank[gameState.currentWord].length - 1) {
-                setGameState((_state: any) => {
-                    return {
-                        ..._state,
-                        score: _state.score + 1,
-                        currentWord: _state.nextWord,
-                        nextWord: _state.wordBank.length === _state.nextWord + 1 ? 0 : _state.nextWord + 1,
-                        letterIndex: 0,
-                    }
-                })
-            } else {
-                setGameState((_state: any) => ({
-                    ..._state,
-                    letterIndex: _state.letterIndex + 1,
-                }))
-            }
-        } else {
+    function onKeyDown(e: KeyboardEvent){
+        handleKeyEvent(e.key, gameState, setGameState, () => {
             clearTimeout(errorTimeout.current)
             setErroredRecently(true)
             errorTimeout.current = setTimeout(() => {
                 setErroredRecently(false)
             }, 250)
-        }
-    }
+        })
+    };
 
     useEffect(() => {
         document.addEventListener("keydown", onKeyDown, false);
@@ -53,25 +59,22 @@ export default function Game(props) {
         };
     });
 
-    function stopTimer() {
-        props.afterGame(gameState)
-    }
-
     useEffect(() => {
-
         clearInterval(timerInterval.current)
         timerInterval.current = setInterval(() => {
             setTimer(prev => {
                 return prev - 100
             })
         }, 100)
-
         return function cleanup() {
             clearTimeout(timerInterval.current)
             clearTimeout(errorTimeout.current)
         };
+    }, [props]);
 
-    }, [props])
+    function stopTimer() {
+        props.afterGame(gameState)
+    }
 
     if (timer <= 0) {
         stopTimer()
